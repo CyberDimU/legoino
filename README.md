@@ -68,7 +68,7 @@ You can find different examples in the "examples" folder. You can select the exa
 * **PoweredUpRemoteAutoDetection.ino:** Example of connection of PoweredUp and PoweredUpRemote where the device type is fetched automatically and the order in which you switched on the hubs is no longer relevant.
 * **ControlPlusHub.ino:** Example with connection of ControlPlusHub (TechnicHub) where a Tacho Motor on Port D is controlled.
 * **Mario.ino** Example of connection to a Mario Hub to read in sensor notifications about the Barcode/Tag sensor, Color sensor, Pants sensor and Gesture sensor.
-
+* **lego_control_ver4** Example of controlling Technic Hub and new Technic Move (e.g. LEGO Porsche GT4 e-Performance) using LILYGO T-Display board.
 
 # Setup and Usage
 
