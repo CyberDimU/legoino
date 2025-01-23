@@ -16,9 +16,8 @@ PowerFunctions	KEYWORD1
 #######################################
 init	KEYWORD2
 connectHub	KEYWORD2
-isConnected KEYWORD2
+isConnected	KEYWORD2
 isConnecting	KEYWORD2
-isScanning	KEYWORD2
 getHubAddress	KEYWORD2
 setHubName	KEYWORD2
 getHubName	KEYWORD2
@@ -32,7 +31,6 @@ ColorStringFromColor KEYWORD2
 
 playSound	KEYWORD2
 playTone	KEYWORD2
-setMarioVolume	KEYWORD2
 
 stopBasicMotor	KEYWORD2
 setBasicMotorSpeed	KEYWORD2
@@ -45,6 +43,12 @@ setTachoMotorSpeedForTime	KEYWORD2
 setTachoMotorSpeedForDegrees	KEYWORD2
 setAbsoluteMotorPosition	KEYWORD2
 setAbsoluteMotorEncoderPosition	KEYWORD2
+
+
+setTechicMoveMotorSpeed KEYWORD2
+calibrateTechnicMoveSteering KEYWORD2
+setTechnicLed KEYWORD2
+
 
 setMotorSpeedsForDegrees	KEYWORD2
 moveForward	KEYWORD2
