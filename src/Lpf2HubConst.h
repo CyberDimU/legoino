@@ -34,6 +34,7 @@ enum struct HubType
   POWERED_UP_REMOTE = 4,
   DUPLO_TRAIN_HUB = 5,
   CONTROL_PLUS_HUB = 6,
+  TECHNIC_MOVE_HUB = 8,
   MARIO_HUB = 7
 };
 
@@ -44,8 +45,9 @@ enum BLEManufacturerData
   POWERED_UP_HUB_ID = 65,    //0x41
   POWERED_UP_REMOTE_ID = 66, //0x42
   MARIO_HUB_ID = 67,         //0x32
-  CONTROL_PLUS_HUB_ID = 128  //0x80
-};
+  CONTROL_PLUS_HUB_ID = 128,  //0x80
+  TECHNIC_MOVE_HUB_ID = 132  //0x84
+  };
 
 enum struct MessageHeader
 {
@@ -106,7 +108,9 @@ enum struct DeviceType
   MARIO_HUB_BARCODE_SENSOR = 73,          // https://github.com/bricklife/LEGO-Mario-Reveng
   MARIO_HUB_PANT_SENSOR = 74,             // https://github.com/bricklife/LEGO-Mario-Reveng
   TECHNIC_MEDIUM_ANGULAR_MOTOR_GREY = 75, // Mindstorms
-  TECHNIC_LARGE_ANGULAR_MOTOR_GREY = 76   // Mindstorms
+  TECHNIC_LARGE_ANGULAR_MOTOR_GREY = 76,   // Mindstorms
+  CONTROL_PLUS_GYRO_SENSOR = 93
+
 };
 
 enum struct MessageType
@@ -311,6 +315,22 @@ enum struct ControlPlusHubPort
   TILT = 0x63
 };
 
+
+
+enum struct TechnicMoveHubPort
+{
+  A = 0x00,
+  B = 0x01,
+  C = 0x02,
+  D = 0x03,  //?
+  LED = 0x35,
+  CURRENT = 0x3B, //?
+  VOLTAGE = 0x3C, //?
+  ACCELEROMETER = 0x61, //?
+  GYRO = 0x5D, //?
+  TILT = 0x63  //?
+};
+
 enum struct DuploTrainHubPort
 {
   MOTOR = 0x00,
@@ -338,6 +358,8 @@ enum struct PoweredUpHubPort
 {
   A = 0x00,
   B = 0x01,
+  C = 0x02,
+  D = 0x03,
   LED = 0x32,
   CURRENT = 0x3B,
   VOLTAGE = 0x3C

@@ -77,6 +77,13 @@ public:
   void stopBasicMotor(byte port);
   void setBasicMotorSpeed(byte port, int speed);
 
+  //New Technic Move HUB+
+  void setTechicMoveMotorSpeed(byte speed, byte angle=0, byte light=0);
+  void calibrateTechnicMoveSteering();
+  void setTechnicLed(byte LedMask, byte power);
+  //New Technic Move HUB-
+
+
   void setAccelerationProfile(byte port, int16_t time);
   void setDecelerationProfile(byte port, int16_t time);
   void stopTachoMotor(byte port);

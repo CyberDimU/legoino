@@ -103,6 +103,11 @@ public:
                     case MARIO_HUB_ID:
                         _lpf2Hub->_hubType = HubType::MARIO_HUB;
                         break;
+ 		   			case TECHNIC_MOVE_HUB_ID:
+                        _lpf2Hub->_hubType = HubType::TECHNIC_MOVE_HUB;
+
+                        break;
+
                     default:
                         _lpf2Hub->_hubType = HubType::UNKNOWNHUB;
                         break;
@@ -1217,6 +1222,47 @@ void Lpf2Hub::setBasicMotorSpeed(byte port, int speed = 0)
 {
     byte setMotorCommand[8] = {0x81, port, 0x11, 0x51, 0x00, LegoinoCommon::MapSpeed(speed)}; //train, batmobil
     WriteValue(setMotorCommand, 6);
+}
+
+/**
+ * @brief Set the motor speed, angle of steerring, and mode of light and break 
+ * @param [in] speed Speed of motor 1-128 forward, 255-128 backward
+ * @param [in] angle Angle of steerring 1-127 left, 255-128 right, 0 central
+ * @param [in] light - mode of the light and break. b00000LPB, 
+ * whehe L light (1 on, 0 off), P power of motor (1 max, 0 min), B - break (1 set break
+ *
+ */
+void Lpf2Hub::setTechicMoveMotorSpeed(byte speed, byte angle, byte light)
+{
+
+    byte setMotorCommand[14] = {0x81, 0x36, 0x11, 0x51, 0x00, 0x03, 0x00, speed, angle, light, 0x00}; 
+    WriteValue(setMotorCommand, 11);
+    delay(100);
+}
+
+/**
+ * @brief Control the light ob the HUB
+ * @param [in] power Power of light, Max 64.
+ * @param [in] LedMask - mask of the light B00ABCDEF
+ * A,B - rear, C,D,E,F - front.
+ * for example B000110 - headlights
+ */
+void Lpf2Hub::setTechnicLed(byte LedMask, byte power)
+{
+ byte ledcom[8] = {0x81, 0x35, 0x11, 0x51, 0x00, LedMask, power}; 
+ WriteValue(ledcom, 7);
+}
+
+/**
+ * @brief Calibrate steerring
+ */
+ void Lpf2Hub::calibrateTechnicMoveSteering()
+{
+    byte setMotorCommandL[14] = {0x81, 0x36, 0x11, 0x51, 0x00, 0x03, 0x00, 0x00, 0x00, 0x10, 0x00}; 
+    WriteValue(setMotorCommandL, 11);
+    delay(100);
+    byte setMotorCommandR[14] = {0x81, 0x36, 0x11, 0x51, 0x00, 0x03, 0x00, 0x00, 0x00, 0x08, 0x00}; 
+    WriteValue(setMotorCommandR, 11);
 }
 
 /**
