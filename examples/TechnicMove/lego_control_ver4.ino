@@ -15,6 +15,7 @@ byte oss = 1;
 byte oldspd = 0;
 byte power_strlight = 0;
 
+boolean FoundHUb = false;
 
 #include <TFT_eSPI.h>  // Graphics and font library for ST7735 driver chip
 
@@ -108,7 +109,7 @@ void hubPropertyChangeCallback(void *hub, HubPropertyReference hubProperty, uint
 
     if (int(myHub->parseRssi(pData)) < -85) {
       tft.drawBitmap(18, 0, level0_16x16, 16, 16, TFT_WHITE, TFT_BLACK);
-   }
+    }
 
     return;
   }
@@ -237,13 +238,7 @@ void setup() {
 // main loop
 void loop() {
 
-  /*Serial.print("light: ");
-Serial.println(state_light);
-Serial.print("speed: ");
-Serial.println(state_speed);
-*/
-
-  //Батарейка в пульте
+  //Get the battery voltage in the remote control
   unsigned long new_bat_time = millis();
   if (((new_bat_time - bat_time) > 2000) || (bat_time == 0)) {
     bat_time = new_bat_time;
@@ -261,6 +256,15 @@ Serial.println(state_speed);
       tft.drawString(String(battery_voltage), 62, 0, 2);
     }
   }
+  if ((!myMoveHub.isScanning()) && (!FoundHUb))  //If HUB is not found, we will start the search again
+  {
+    myMoveHub.init();
+  }
+
+  if (!FoundHUb)  //If HUB is not found, we will pause so as not to overload the board
+  {
+    delay(60);
+  }
 
   if (myMoveHub.isConnected()) {
     if (VerHub == 8) {
@@ -272,13 +276,16 @@ Serial.println(state_speed);
 
   if (myMoveHub.isConnecting()) {
 
+    FoundHUb = true;
     myMoveHub.connectHub();
+
 
     if (myMoveHub.isConnected() && !isInitialized) {
       Serial.println("Connected to HUB");
       tft.fillScreen(TFT_BLACK);
       bat_time = 0;
 
+      //Not all HUBs return a name, so we'll get it next.
       //delay(50); //needed because otherwise the message is to fast after the connection procedure and the message will get lost
       //myMoveHub.activateHubPropertyUpdate(HubPropertyReference::ADVERTISING_NAME, hubPropertyChangeCallback);
 
@@ -307,14 +314,14 @@ Serial.println(state_speed);
       myMoveHub.activatePortDevice((byte)ControlPlusHubPort::GYRO, portValueChangeCallback);
 
       NameHub = myMoveHub.getHubName().c_str();
-      Serial.println(NameHub);
+      //Serial.println(NameHub);
 
       tft.setTextColor(TFT_BLUE, TFT_BLACK);
       tft.drawCentreString(NameHub, 67, 20, 2);
       tft.setTextColor(TFT_WHITE, TFT_BLACK);
 
       VerHub = byte(myMoveHub.getHubType());
-      Serial.println(VerHub);
+      //Serial.println(VerHub);
 
       if (VerHub == 8) {
         delay(50);
@@ -324,18 +331,17 @@ Serial.println(state_speed);
         if (rc == PNG_SUCCESS) {
           xpos = 0;
           ypos = 155;
-          Serial.println("Successfully opened png file");
-          Serial.printf("image specs: (%d x %d), %d bpp, pixel type: %d\n", png.getWidth(), png.getHeight(), png.getBpp(), png.getPixelType());
           tft.startWrite();
           uint32_t dt = millis();
           rc = png.decode(NULL, 0);
-          Serial.print(millis() - dt);
-          Serial.println("ms");
           tft.endWrite();
           // png.close(); // not needed for memory->memory decode
         } else {
-          Serial.println("bad");
+          //Failed to get image
+          //Serial.println("Failed to get image");
         }
+
+        delay(300);
 
         porshe_light_speed_drw();
 
@@ -346,17 +352,14 @@ Serial.println(state_speed);
         if (rc == PNG_SUCCESS) {
           xpos = 0;
           ypos = 155;
-          Serial.println("Successfully opened png file");
-          Serial.printf("image specs: (%d x %d), %d bpp, pixel type: %d\n", png.getWidth(), png.getHeight(), png.getBpp(), png.getPixelType());
           tft.startWrite();
           uint32_t dt = millis();
           rc = png.decode(NULL, 0);
-          Serial.print(millis() - dt);
-          Serial.println("ms");
           tft.endWrite();
           // png.close(); // not needed for memory->memory decode
         } else {
-          Serial.println("bad");
+          //Failed to get image
+          //Serial.println("Failed to get image");
         }
       }
 
@@ -388,8 +391,8 @@ Serial.println(state_speed);
 
 
 void OldHubMove() {
-  int x = analogRead(37);
-  int y = analogRead(36);
+  int x = analogRead(37);  //Engine
+  int y = analogRead(36);  //Steering
 
   /*Serial.print("X:");
   Serial.print(x);
@@ -427,8 +430,8 @@ void OldHubMove() {
 }
 
 void NewHubMove() {
-  int x = analogRead(37);
-  int y = analogRead(36);
+  int x = analogRead(37);  //Engine
+  int y = analogRead(36);  //Steering
 
   /*Serial.print("X:");
  Serial.print(x);
@@ -449,7 +452,7 @@ void NewHubMove() {
 
   if ((speedclick == 0) && (oss == 1)) {
     //Serial.println("speedclick");
-    state_speed = state_speed ^ 2; //0000 0010
+    state_speed = state_speed ^ 2;  //0000 0010
     //Serial.println(state_speed);
     flag = 1;
     oss = 0;
@@ -459,27 +462,6 @@ void NewHubMove() {
   oss = digitalRead(speed_pin);
 
   if (flag == 1) {
-    /*if (state_speed == 2) {
-        tft.setTextColor(TFT_WHITE, TFT_BLACK);
-        tft.drawCentreString(" SPEED MIN ", 67, 150, 4);
-      }
-      else
-      {
-        tft.setTextColor(TFT_RED, TFT_BLACK);
-        tft.drawCentreString(" SPEED MAX ", 67, 150, 4);
-      }
-
-      if (state_light == 4) {
-        tft.setTextColor(TFT_WHITE, TFT_BLACK);
-        tft.drawCentreString(" LIGHT OFF ", 67, 180, 4);
-      }
-      else
-      {
-        tft.setTextColor(TFT_RED, TFT_BLACK);
-        tft.drawCentreString(" LIGHT ON ", 67, 180, 4);
-      }
-      */
-
     porshe_light_speed_drw();
   }
 
@@ -496,7 +478,6 @@ void NewHubMove() {
   } else {
     spd = 0;
   }
-  Serial.println(y);
 
   if (y > 1930)  //Влево
   {
@@ -538,7 +519,7 @@ void right_blink() {
     power_strlight = power_strlight ^ 48;
     myMoveHub.setTechnicLed(B000001, 0);
     myMoveHub.setTechnicLed(B001000, power_strlight);
-    Serial.println("L" + String(power_strlight));
+    //Serial.println("L" + String(power_strlight));
   }
 }
 
@@ -549,27 +530,24 @@ void left_blink() {
     power_strlight = power_strlight ^ 48;
     myMoveHub.setTechnicLed(B001000, 0);
     myMoveHub.setTechnicLed(B000001, power_strlight);
-    Serial.println("R" + String(power_strlight));
+    //Serial.println("R" + String(power_strlight));
   }
 }
 
 
 void pngDraw(PNGDRAW *pDraw) {
-  Serial.println("bad bad bad");
   uint16_t lineBuffer[MAX_IMAGE_WIDTH_audi];
   png.getLineAsRGB565(pDraw, lineBuffer, PNG_RGB565_BIG_ENDIAN, 0xffffffff);
   tft.pushImage(xpos, ypos + pDraw->y, pDraw->iWidth, 1, lineBuffer);
 }
 
 void pngDraw_light(PNGDRAW *pDraw) {
-  Serial.println("bad bad bad");
   uint16_t lineBuffer[MAX_IMAGE_WIDTH_audi];
   png.getLineAsRGB565(pDraw, lineBuffer, PNG_RGB565_BIG_ENDIAN, 0xffffffff);
   tft.pushImage(xpos_light, ypos_light + pDraw->y, pDraw->iWidth, 1, lineBuffer);
 }
 
 void pngDraw_speed(PNGDRAW *pDraw) {
-  Serial.println("bad bad bad");
   uint16_t lineBuffer[MAX_IMAGE_WIDTH_audi];
   png.getLineAsRGB565(pDraw, lineBuffer, PNG_RGB565_BIG_ENDIAN, 0xffffffff);
   tft.pushImage(xpos_speed, ypos_speed + pDraw->y, pDraw->iWidth, 1, lineBuffer);
@@ -586,82 +564,57 @@ void porshe_light_speed_drw()
   ypos_light = 150;
 
   if (state_speed == 2) {
-    //       tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    //       tft.drawCentreString(" SPEED MIN ", 67, 150, 4);
-
     int16_t rc = png.openFLASH((uint8_t *)std_speed, sizeof(std_speed), pngDraw_speed);
     if (rc == PNG_SUCCESS) {
-      Serial.println("Successfully opened png file");
-      Serial.printf("image specs: (%d x %d), %d bpp, pixel type: %d\n", png.getWidth(), png.getHeight(), png.getBpp(), png.getPixelType());
       tft.startWrite();
       uint32_t dt = millis();
       rc = png.decode(NULL, 0);
-      Serial.print(millis() - dt);
-      Serial.println("ms");
       tft.endWrite();
       // png.close(); // not needed for memory->memory decode
     } else {
-      Serial.println("bad");
+      //Failed to get image
+      //Serial.println("Failed to get image");
     }
   }
 
   else {
-    //       tft.setTextColor(TFT_RED, TFT_BLACK);
-    //       tft.drawCentreString(" SPEED MAX ", 67, 150, 4);
-
     int16_t rc = png.openFLASH((uint8_t *)max_speed, sizeof(max_speed), pngDraw_speed);
     if (rc == PNG_SUCCESS) {
-      Serial.println("Successfully opened png file");
-      Serial.printf("image specs: (%d x %d), %d bpp, pixel type: %d\n", png.getWidth(), png.getHeight(), png.getBpp(), png.getPixelType());
       tft.startWrite();
       uint32_t dt = millis();
       rc = png.decode(NULL, 0);
-      Serial.print(millis() - dt);
-      Serial.println("ms");
       tft.endWrite();
       // png.close(); // not needed for memory->memory decode
     } else {
-      Serial.println("bad");
+      //Failed to get image
+      //Serial.println("Failed to get image");
     }
   }
 
   if (state_light == 4) {
-    //       tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    //       tft.drawCentreString(" LIGHT OFF ", 67, 180, 4);
-
     int16_t rc = png.openFLASH((uint8_t *)light_off, sizeof(light_off), pngDraw_light);
     if (rc == PNG_SUCCESS) {
-      Serial.println("Successfully opened png file");
-      Serial.printf("image specs: (%d x %d), %d bpp, pixel type: %d\n", png.getWidth(), png.getHeight(), png.getBpp(), png.getPixelType());
       tft.startWrite();
       uint32_t dt = millis();
       rc = png.decode(NULL, 0);
-      Serial.print(millis() - dt);
-      Serial.println("ms");
       tft.endWrite();
       // png.close(); // not needed for memory->memory decode
     } else {
-      Serial.println("bad");
+      //Failed to get image
+      //Serial.println("Failed to get image");
     }
 
   } else {
-    //        tft.setTextColor(TFT_RED, TFT_BLACK);
-    //        tft.drawCentreString(" LIGHT ON ", 67, 180, 4);
-
-
     int16_t rc = png.openFLASH((uint8_t *)light_on, sizeof(light_on), pngDraw_light);
     if (rc == PNG_SUCCESS) {
-      Serial.println("Successfully opened png file");
-      Serial.printf("image specs: (%d x %d), %d bpp, pixel type: %d\n", png.getWidth(), png.getHeight(), png.getBpp(), png.getPixelType());
       tft.startWrite();
       uint32_t dt = millis();
       rc = png.decode(NULL, 0);
-      Serial.print(millis() - dt);
-      Serial.println("ms");
       tft.endWrite();
       // png.close(); // not needed for memory->memory decode
     } else {
-      Serial.println("bad");
+      //Failed to get image
+      //Serial.println("Failed to get image");
     }
   }
 }
