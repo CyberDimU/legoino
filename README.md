@@ -70,11 +70,11 @@ You can find different examples in the "examples" folder. You can select the exa
 * **Mario.ino** Example of connection to a Mario Hub to read in sensor notifications about the Barcode/Tag sensor, Color sensor, Pants sensor and Gesture sensor.
 * **lego_control_ver4.ino** Example of controlling Technic Hub and new Technic Move (e.g. LEGO Porsche GT4 e-Performance) using LILYGO T-Display board.
 * **lego_control_ver9.ino** New version of the remote control.
-Supports:
-- Technic HUB (Audi RS Q e-tron (42160) and other)
-- Technic Move (Porsche GT4 e-Performance (42176))
-Built on the LILYGO T-Display S3 controller.
-Note: If the image disappears or is distorted, press and hold the right button on the controller.
+    Supports:
+      Technic HUB (Audi RS Q e-tron (42160) and other)
+      Technic Move (Porsche GT4 e-Performance (42176))
+    Built on the LILYGO T-Display S3 controller.
+    Note: If the image disappears or is distorted, press and hold the right button on the controller.
 
 # Setup and Usage
 
